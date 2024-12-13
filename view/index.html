@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐推荐系统-主页</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            
+            /* background-repeat: no-repeat; */
+            background-image: linear-gradient(120deg, #a87dd1 0%, #669dd4 100%);
+            background-size: 100% 100%;
+            background-position: center;
+            justify-content: center;
+            align-items: top, center;
+            animation: color_change 1s infinite;
+        }
+
+        @keyframes color_change {
+            0% {
+                background-position: 100% 0%;
+            }
+            /* 50% {
+                background-position: 100% 50%;
+            } */
+            100% {
+                background-position: 0% 100%;
+            }
+        }
+
+        .carousel-container {
+            width: 100%;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 80px;
+            /* color: #333; */
+            color: white;
+            margin: 40px;
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h3 {
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .button_area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .custom-button {
+            margin: 40px;
+            padding: 30px;
+            font-size: 20px;
+            border: 1px solid white;
+            color: white;
+            background-color: transparent;
+            /* border:10px; */
+            border-width: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="carousel-container">
+            <el-carousel indicator-position="outside" type="card">
+                <el-carousel-item v-for="item in 5" :key="item">
+                    <el-image :src="imageUrl[item-1]" fit="fill" @click="openUrl(imageUrl)"></el-image>
+                </el-carousel-item>
+            </el-carousel>
+            <transition name="el-zoom-in-bottom">
+                <div v-show="show_title">
+                    <h1>~♪~ 音乐推荐系统 ~♬~</h1>
+                </div>
+            </transition>
+            <transition name="el-zoom-in-bottom">
+                <div v-show="show_subtitle">
+                    <h3>给十个音乐打分🌟，然后根据大数据推荐算法，推荐十个您可能喜欢的音乐❤</h3>
+                </div>
+            </transition>
+            <transition name="el-zoom-in-bottom">
+                <div class="button_area" v-show="show_button">
+                    <el-button class="custom-button" @click="login_page()">登录或注册</el-button>
+                    <el-button class="custom-button" @click="recommond_page()">直接进入</el-button>
+                </div>
+            </transition>
+        </div>
+
+    </div>
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="my_func.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    loginForm: {
+                        username: '',
+                        password: '',
+                    },
+                    imageUrl: [
+                        'static/miku.jpg', 'static/mygo.png', 'static/april.png', 'static/girls-band-cry-teaser.jpg', 'static/bochi.png'
+                    ],
+                    show_title: false,
+                    show_subtitle: false,
+                    show_button: false
+                };
+            },
+            mounted() {
+                setTimeout(() => {
+                    this.show_title = true;
+                }, 500);
+                setTimeout(() => {
+                    this.show_subtitle = true;
+                }, 750);
+                setTimeout(() => {
+                    this.show_button = true;
+                }, 1000);
+
+            },
+            methods: {
+                login_page() {
+                    window.location.href = 'login.html';
+                },
+                recommond_page() {
+                    window.location.href = 'recommond.html';
+                }
+            }
+        }
+        );
+    </script>
+</body>
+
+</html>
