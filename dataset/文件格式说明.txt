@@ -1,0 +1,8 @@
+在 ratings.dat 文件中，每一行数据包含四个字段，分别是用户ID、电影ID、评分和时间戳。你提到的 personalRatings.dat 文件中的数据格式可能与 ratings.dat 类似，但具体含义需要根据文件的上下文来确定。
+
+假设 personalRatings.dat 文件的格式与 ratings.dat 相同，每一行数据包含四个字段，用双冒号 :: 分隔。以下是每个字段的含义：
+
+用户ID（User ID）：表示评分的用户的唯一标识符。
+电影ID（Movie ID）：表示被评分的电影的唯一标识符。
+评分（Rating）：用户对电影的评分，范围是1到5的整数。
+时间戳（Timestamp）：表示评分的时间，通常是自1970年1月1日以来的秒数。
