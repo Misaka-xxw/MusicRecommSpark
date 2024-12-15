@@ -3,7 +3,7 @@ import asyncio
 import uuid
 import time
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file, redirect
 from flask_cors import CORS, cross_origin
 
 PERSONAL_RATINGS_CACHE_PATH = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/personal_ratings_cache"
@@ -143,7 +143,7 @@ def delete_result(task_id):
 def get_musics_count():
     return jsonify({"max_id":CONFIG_JSON['max_id']})
 
-@app.route('/apis/v1/get-musics-info', methods=['GET'])
+@app.route('/apis/v1/get-musics-info', methods=['POST'])
 @cross_origin(origin='*')
 def get_musics_info():
     if request.content_type != 'application/json':
@@ -166,6 +166,51 @@ def get_musics_info():
             music_info[str(music_id)] = "Music ID not found"
 
     return jsonify(music_info)
+
+# css and js static resources
+@app.route('/css/element-ui.css', methods=['GET'])
+@cross_origin(origin='*')
+def get_element_ui_css():
+    CSS_PATH_ELEMENT_UI = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/element-ui.css"
+    return send_file(CSS_PATH_ELEMENT_UI, mimetype='text/css')
+
+@app.route('/css/vue.js', methods=['GET'])
+@cross_origin(origin='*')
+def get_vue_js():
+    JS_PATH_VUE = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/vue.js"
+    return send_file(JS_PATH_VUE, mimetype='text/javascript')
+
+@app.route('/css/index.js', methods=['GET'])
+@cross_origin(origin='*')
+def get_index_js():
+    JS_PATH_INDEX = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/index.js"
+    return send_file(JS_PATH_INDEX, mimetype='text/javascript')
+
+@app.route('/css/fonts/element-icons.woff', methods=['GET'])
+@cross_origin(origin='*')
+def get_element_icons_woff():
+    WOFF_PATH_ELEMENT_ICONS = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/element-icons.woff"
+    return send_file(WOFF_PATH_ELEMENT_ICONS)
+
+@app.route('/css/fonts/element-icons.ttf', methods=['GET'])
+@cross_origin(origin='*')
+def get_element_icons_ttf():
+    TTF_PATH_ELEMENT_ICONS = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/element-icons.ttf"
+    return send_file(TTF_PATH_ELEMENT_ICONS)
+
+# HTML pages in website
+@app.route('/recommend.html', methods=['GET'])
+@cross_origin(origin='*')
+def get_recommend_page():
+    HTML_PATH_RECOMMEND = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/recommond.html"
+    return send_file(HTML_PATH_RECOMMEND)
+
+@app.route('/', methods=['GET'])
+@cross_origin(origin='*')
+def index():
+    return redirect('/recommend.html')
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎹音乐推荐系统🎵</title>
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- currently https://unpkg.com/element-ui/lib/theme-chalk/index.css redirects to  https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css -->
+    <!-- saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/element-ui.css -->
+    <link rel="stylesheet" href="http://127.0.0.1:5000/css/element-ui.css">
     <style>
         .album {
             position: relative;
@@ -128,8 +130,12 @@
         </div>
         <img src="static/miku.gif" alt="Fixed GIF" class="fixed-gif" />
     </div>
-    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <!-- Currently https://unpkg.com/vue@2/dist/vue.js redirects to https://unpkg.com/vue@2.7.16/dist/vue.js -->
+    <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/vue.js-->
+    <script src="http://127.0.0.1:5000/css/vue.js"></script>
+    <!-- Currently https://unpkg.com/element-ui/lib/index.js redirects to  https://unpkg.com/element-ui@2.15.14/lib/index.js -->
+    <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/index.js -->
+    <script src="http://127.0.0.1:5000/css/index.js"></script>
     <script>
         new Vue({
             el: '#app',
@@ -140,7 +146,7 @@
                     mode: true, //true表示打分模式，false表示结果模式
                     button_text: '打好分了，开始推荐🌟',
                     title: '🎹音乐打分🎵',
-                    maxId:null,
+                    maxId: null,
                     albums: [{
                         id: 1,
                         name: '音乐1',
@@ -224,41 +230,56 @@
                     }]
                 }
             },
-            created() {
+            async created() {
                 this.username = localStorage.getItem('username') || '未登录';
-                let maxId=this.getMaxId();
-                console.log(maxId);
-                // Generate 10 unique random integers between 1 and maxId
-                let randomIds = new Set();
-                while (randomIds.size < 10) {
-                    let rand = Math.floor(Math.random() * maxId) + 1;
-                    randomIds.add(rand);
-                }
-                let idsArray = Array.from(randomIds);
-                // Use "get movie info" API to post these numbers as JSON to the server
-                fetch('http://127.0.0.1:5000/apis/v1/get-musics-info', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(idsArray)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Handle the response data
-                    console.log(data);
-                })
-                .catch(error => console.error(error));
+                let maxId = await this.getMaxId();
+                console.log('maxID:', maxId); // This console.log can not run.
+
+                let randomIds = await this.getRandomMusicID();
+
+                let requestInfoResult = await this.getMoviesInfo(randomIds);
+
             },
             methods: {
                 openUrl(url) {
                     window.open(url, '_blank');
                 },
-                async getMaxId(){
-                    let msg1= await this.getFlask('http://127.0.0.1:5000/apis/v1/get-musics-count');
+                async getMaxId() {
+                    let msg1 = await this.getFlask('http://127.0.0.1:5000/apis/v1/get-musics-count');
                     console.log(msg1);
                     this.maxId = msg1['max_id'];
-                    console.log(this.maxId);
+                    console.log('async get Max ID:', this.maxId);
+                    return this.maxId;
+                },
+                async getRandomMusicID() {
+                    let randomIds = new Set();
+                    while (randomIds.size < 10) {
+                        let rand = Math.floor(Math.random() * this.maxId) + 1;
+                        console.log('rand:', rand);
+                        randomIds.add(rand);
+                    }
+                    console.log('randomIds:', randomIds);
+                    return randomIds;
+                },
+                async getMoviesInfo(randomIds) {
+                    // Convert Set to Array
+                    let idsArray = Array.from(randomIds);
+                    console.log(idsArray);
+                    // Use "get movie info" API to post these numbers as JSON to the server
+                    fetch('http://127.0.0.1:5000/apis/v1/get-musics-info', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(idsArray)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Handle the response data
+                            console.log(data);
+                            return data;
+                        })
+                        .catch(error => console.error(error));
                 },
                 back_loginpage() {
                     window.location.href = 'login.html';
