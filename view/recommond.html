@@ -9,17 +9,17 @@
     <style>
         .album {
             position: relative;
-            width: 200px;
-            height: 240px;
-            margin: 20px;
+            width: 300px;
+            height: 340px;
+            margin: 30px;
         }
-        
+
         .album img {
             width: 100%;
-            height: 200px;
+            height: 300px;
             border-radius: 8px;
         }
-        
+
         .album-info {
             position: absolute;
             bottom: 0;
@@ -34,25 +34,23 @@
             transition: opacity 0.3s;
             border-radius: 0 0 8px 8px;
         }
-        
+
         .album:hover .album-info {
             opacity: 1;
         }
-        
+
         .albums-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
         }
-        
+
         .header {
-            /* background-color: #7bb1e7; */
-            /* background-image: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%); */
             background-image: linear-gradient(120deg, #a87dd1 0%, #669dd4 100%);
             color: aliceblue;
             padding: 10px;
         }
-        
+
         .admin {
             color: aliceblue;
             font-size: medium;
@@ -61,30 +59,29 @@
             margin-right: 20px;
             margin-bottom: -40px;
         }
-        
+
         .page-title {
             font-size: 32px;
             font-weight: bold;
             text-align: center;
             margin: 5px 0;
-            /* color: #409EFF; */
             color: aliceblue;
             padding: 20px;
         }
-        
+
         .button-container {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-left: 20px;
         }
-        
+
         .custom-button {
             border: 1px solid white;
             color: white;
             background-color: transparent;
         }
-        
+
         .fixed-gif {
             position: fixed;
             bottom: 10px;
@@ -120,9 +117,7 @@
                     <p>简介：{{ album.description }}</p>
                     <p>作者：{{ album.raw }}</p>
                 </div>
-
             </div>
-
         </div>
         <div class="button-container">
             <el-button type="primary" style="justify-content: center;align-items: center;" @click="submit()">
@@ -132,7 +127,6 @@
             </el-button>
         </div>
         <img src="static/miku.gif" alt="Fixed GIF" class="fixed-gif" />
-
     </div>
     <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
@@ -150,7 +144,7 @@
                         id: 1,
                         name: '音乐1',
                         description: '这是音乐1的简介啦啦啦啦啦啦啦啦',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -158,7 +152,7 @@
                         id: 2,
                         name: '音乐2',
                         description: '这是音乐2的简介',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -166,7 +160,7 @@
                         id: 3,
                         name: '音乐3',
                         description: '这是音乐3的简介',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -174,7 +168,7 @@
                         id: 4,
                         name: '音乐4',
                         description: '这是音乐4的简介',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -182,7 +176,7 @@
                         id: 5,
                         name: '音乐5',
                         description: '这是音乐5的简介',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -190,7 +184,7 @@
                         id: 6,
                         name: '音乐6',
                         description: '这是音乐6的简介',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -198,7 +192,7 @@
                         id: 7,
                         name: '音乐7',
                         description: '这是音乐7的简介',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -206,7 +200,7 @@
                         id: 8,
                         name: '音乐8',
                         description: '这是音乐8的简介',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -214,7 +208,7 @@
                         id: 9,
                         name: '音乐9',
                         description: '这是音乐9的简介',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -222,7 +216,7 @@
                         id: 10,
                         name: '音乐10',
                         description: '这是音乐10的简介',
-                        imageUrl: 'https://via.placeholder.com/200',
+                        imageUrl: 'https://via.placeholder.com/300',
                         raw: '',
                         url: '',
                         rate: 0
@@ -231,12 +225,7 @@
             },
             created() {
                 this.username = localStorage.getItem('username') || '未登录';
-                // console.log('当前用户名:', this.username);
             },
-            // mounted() {
-            //     // 动态设置页面标题
-            //     document.title = this.title;
-            // },
             methods: {
                 openUrl(url) {
                     window.open(url, '_blank');
@@ -247,30 +236,51 @@
                 back_homepage() {
                     window.location.href = 'index.html';
                 },
-                submit() {
+                async submit() {
                     this.loading = true;
                     if (this.mode) {
-                        //打分模式
                         this.button_text = '正在推荐中...';
+                        const result = await this.startTask();
+                        console.log(result);
                     } else {
-                        //结果模式
-
+                        // 结果模式
                     }
-                    setTimeout(() => {
-                        this.loading = false;
-                        this.mode = 1 - this.mode;
-                    }, 1000);
+                    this.loading = false;
+                    this.mode = 1 - this.mode;
                     if (this.mode) {
-                        //打分模式
-                        // this.title = '🎹推荐音乐🎵'
                         this.button_text = '重新打分和推荐🔁'
                     } else {
-                        //结果模式
-                        // this.title = '🎹评分🎵'
                         this.button_text = '打好分了，开始推荐🌟'
                     }
+                },
+                async startTask() {
+                    const data = {
+                        personal_ratings: [
+                            { user_id: 1, movie_id: 101, rating: 5, timestamp: 1234567890 },
+                            { user_id: 1, movie_id: 101, rating: 5, timestamp: 1234567890 },
+                            { user_id: 1, movie_id: 102, rating: 3, timestamp: 1234567891 }
+                        ]
+                    };
+                    const response = await fetch('http://127.0.0.1:5000/start-task', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    return response.json();
+                },
+                async getData(url = '') {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    return response.json();
                 }
-            }
+
+            },
         });
     </script>
 </body>
