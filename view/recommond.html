@@ -140,6 +140,7 @@
                     mode: true, //true表示打分模式，false表示结果模式
                     button_text: '打好分了，开始推荐🌟',
                     title: '🎹音乐打分🎵',
+                    maxId:null,
                     albums: [{
                         id: 1,
                         name: '音乐1',
@@ -225,10 +226,39 @@
             },
             created() {
                 this.username = localStorage.getItem('username') || '未登录';
+                let maxId=this.getMaxId();
+                console.log(maxId);
+                // Generate 10 unique random integers between 1 and maxId
+                let randomIds = new Set();
+                while (randomIds.size < 10) {
+                    let rand = Math.floor(Math.random() * maxId) + 1;
+                    randomIds.add(rand);
+                }
+                let idsArray = Array.from(randomIds);
+                // Use "get movie info" API to post these numbers as JSON to the server
+                fetch('http://127.0.0.1:5000/apis/v1/get-musics-info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(idsArray)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response data
+                    console.log(data);
+                })
+                .catch(error => console.error(error));
             },
             methods: {
                 openUrl(url) {
                     window.open(url, '_blank');
+                },
+                async getMaxId(){
+                    let msg1= await this.getFlask('http://127.0.0.1:5000/apis/v1/get-musics-count');
+                    console.log(msg1);
+                    this.maxId = msg1['max_id'];
+                    console.log(this.maxId);
                 },
                 back_loginpage() {
                     window.location.href = 'login.html';
@@ -270,7 +300,7 @@
                     });
                     return response.json();
                 },
-                async getData(url = '') {
+                async getFlask(url) {
                     const response = await fetch(url, {
                         method: 'GET',
                         headers: {

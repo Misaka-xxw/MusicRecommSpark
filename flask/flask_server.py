@@ -122,15 +122,15 @@ def delete_result(task_id):
     else:
         return jsonify({"error": "Task not found"}), 404
     
-@app.route('/apis/v1/get-musics-imgurls', methods=['POST'])
-@cross_origin(origin='*')
-def get_musics_urls():
-    if request.content_type != 'application/json':
-        return jsonify({"error": "Content type must be application/json"}), 400
+# @app.route('/apis/v1/get-musics-', methods=['POST'])
+# @cross_origin(origin='*')
+# def get_musics_urls():
+#     if request.content_type != 'application/json':
+#         return jsonify({"error": "Content type must be application/json"}), 400
 
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Invalid JSON"}), 400
+#     data = request.get_json()
+#     if not data:
+#         return jsonify({"error": "Invalid JSON"}), 400
 
     # music_ids = data['music_ids']
     # music_urls = {}
