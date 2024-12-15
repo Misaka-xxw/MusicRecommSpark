@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎹音乐推荐系统🎵</title>
-    <!-- currently https://unpkg.com/element-ui/lib/theme-chalk/index.css redirects to  https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css -->
-    <!-- saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/element-ui.css -->
-    <link rel="stylesheet" href="http://127.0.0.1:5000/css/element-ui.css">
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>🎹音乐推荐系统🎵</title>
+        <!-- currently https://unpkg.com/element-ui/lib/theme-chalk/index.css redirects to  https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css -->
+        <!-- saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/element-ui.css -->
+        <link rel="stylesheet" href="http://127.0.0.1:5000/css/element-ui.css">
+        <style>
         .album {
             position: relative;
             width: 300px;
@@ -92,51 +92,58 @@
             height: auto;
         }
     </style>
-</head>
+    </head>
 
-<body>
-    <div id="app" v-loading="loading">
-        <div class="header">
-            <div class="admin">
-                账号：{{ username }}
-                <el-button class="custom-button" @click="back_loginpage()"> 登录或注册 </el-button>
-                <el-button class="custom-button" @click="back_homepage()"> 返回主页 </el-button>
-            </div>
-            <div class="page-title">
-                🎹音乐推荐系统🎵
-                <br />
-            </div>
-            <h4 style="text-align: center;">请为以下音乐打分</h4>
-        </div>
-        <div class="albums-container">
-            <div class="album" v-for="album in albums" :key="album.id">
-                <el-image :src="album.imageUrl" fit="cover" @click="openUrl(album.url)"></el-image>
-                <div>
-                    <el-rate v-model="album.rate" v-show="mode" show-text></el-rate>
+    <body>
+        <div id="app" v-loading="loading">
+            <div class="header">
+                <div class="admin">
+                    账号：{{ username }}
+                    <el-button class="custom-button" @click="back_loginpage()">
+                        登录或注册 </el-button>
+                    <el-button class="custom-button" @click="back_homepage()">
+                        返回主页 </el-button>
                 </div>
-                <div class="album-info" @click="openUrl(album.url)">
-                    <h3>{{ album.name }}</h3>
-                    <p>简介：{{ album.description }}</p>
-                    <p>作者：{{ album.raw }}</p>
+                <div class="page-title">
+                    🎹音乐推荐系统🎵
+                    <br />
+                </div>
+                <h4 style="text-align: center;">请为以下音乐打分</h4>
+            </div>
+            <div class="albums-container">
+                <div class="album" v-for="album in albums" :key="album.id">
+                    <el-image :src="album.img_url" fit="cover"
+                        @click="openUrl(album.click_url)"></el-image>
+                    <div>
+                        <el-rate v-model="album.rate" v-show="mode"
+                            show-text></el-rate>
+                    </div>
+                    <div class="album-info" @click="openUrl(album.url)">
+                        <h3>{{ album.name }}</h3>
+                        <p>简介：{{ album.description }}</p>
+                        <p>作者：{{ album.raw }}</p>
+                    </div>
                 </div>
             </div>
+            <div class="button-container">
+                <el-button type="primary"
+                    style="justify-content: center;align-items: center;"
+                    @click="submit()">
+                    <p
+                        style="font-size: 20px;font-weight: bold;text-align: center;">
+                        {{button_text}}
+                    </p>
+                </el-button>
+            </div>
+            <img src="static/miku.gif" alt="Fixed GIF" class="fixed-gif" />
         </div>
-        <div class="button-container">
-            <el-button type="primary" style="justify-content: center;align-items: center;" @click="submit()">
-                <p style="font-size: 20px;font-weight: bold;text-align: center;">
-                    {{button_text}}
-                </p>
-            </el-button>
-        </div>
-        <img src="static/miku.gif" alt="Fixed GIF" class="fixed-gif" />
-    </div>
-    <!-- Currently https://unpkg.com/vue@2/dist/vue.js redirects to https://unpkg.com/vue@2.7.16/dist/vue.js -->
-    <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/vue.js-->
-    <script src="http://127.0.0.1:5000/css/vue.js"></script>
-    <!-- Currently https://unpkg.com/element-ui/lib/index.js redirects to  https://unpkg.com/element-ui@2.15.14/lib/index.js -->
-    <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/index.js -->
-    <script src="http://127.0.0.1:5000/css/index.js"></script>
-    <script>
+        <!-- Currently https://unpkg.com/vue@2/dist/vue.js redirects to https://unpkg.com/vue@2.7.16/dist/vue.js -->
+        <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/vue.js-->
+        <script src="http://127.0.0.1:5000/css/vue.js"></script>
+        <!-- Currently https://unpkg.com/element-ui/lib/index.js redirects to  https://unpkg.com/element-ui@2.15.14/lib/index.js -->
+        <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/index.js -->
+        <script src="http://127.0.0.1:5000/css/index.js"></script>
+        <script>
         new Vue({
             el: '#app',
             data() {
@@ -148,86 +155,94 @@
                     title: '🎹音乐打分🎵',
                     maxId: null,
                     albums: [{
-                        id: 1,
-                        name: '音乐1',
-                        description: '这是音乐1的简介啦啦啦啦啦啦啦啦',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                        id:1,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
                     }, {
-                        id: 2,
-                        name: '音乐2',
-                        description: '这是音乐2的简介',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                        id:2,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
-                    }, {
-                        id: 3,
-                        name: '音乐3',
-                        description: '这是音乐3的简介',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                    }, 
+                    {
+                        id:3,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
-                    }, {
-                        id: 4,
-                        name: '音乐4',
-                        description: '这是音乐4的简介',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                    }, 
+                    {
+                        id:4,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
-                    }, {
-                        id: 5,
-                        name: '音乐5',
-                        description: '这是音乐5的简介',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                    }, 
+                    {
+                        id:5,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
-                    }, {
-                        id: 6,
-                        name: '音乐6',
-                        description: '这是音乐6的简介',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                    }, 
+                    {
+                        id:6,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
-                    }, {
-                        id: 7,
-                        name: '音乐7',
-                        description: '这是音乐7的简介',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                    }, 
+                    {
+                        id:7,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
-                    }, {
-                        id: 8,
-                        name: '音乐8',
-                        description: '这是音乐8的简介',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                    }, 
+                    {
+                        id:8,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
-                    }, {
-                        id: 9,
-                        name: '音乐9',
-                        description: '这是音乐9的简介',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                    }, 
+                    {
+                        id:9,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
-                    }, {
-                        id: 10,
-                        name: '音乐10',
-                        description: '这是音乐10的简介',
-                        imageUrl: 'https://via.placeholder.com/300',
-                        raw: '',
-                        url: '',
+                    }, 
+                    {
+                        id:10,
+                        click_url: "https://music.douban.com/subject/6846847/",
+                        img_url: "",
+                        name: "Ravel Shéhérazade",
+                        tag: "古典",
+                        year: "1991",
                         rate: 0
-                    }]
+                    }, ]
                 }
             },
             async created() {
@@ -238,7 +253,9 @@
                 let randomIds = await this.getRandomMusicID();
 
                 let requestInfoResult = await this.getMoviesInfo(randomIds);
-
+                // console.log('requestInfoResult:', requestInfoResult);
+                this.albums = await this.moviesInfo2Albums(requestInfoResult);
+                
             },
             methods: {
                 openUrl(url) {
@@ -266,21 +283,41 @@
                     let idsArray = Array.from(randomIds);
                     console.log(idsArray);
                     // Use "get movie info" API to post these numbers as JSON to the server
-                    fetch('http://127.0.0.1:5000/apis/v1/get-musics-info', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(idsArray)
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            // Handle the response data
-                            console.log(data);
-                            return data;
-                        })
-                        .catch(error => console.error(error));
+                    try{
+                        const response = await fetch('http://127.0.0.1:5000/apis/v1/get-musics-info', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(idsArray)
+                        });
+                        const data = await response.json();
+                        console.log('getMovieInfo Return data:', data);
+                        return data;
+                    } catch(error) {
+                        console.error('Error:', error);
+                    }
                 },
+                async moviesInfo2Albums(moviesInfo) {
+                    console.log('moviesInfo:', moviesInfo);
+                    let albums = [];
+                    let keys = Object.keys(moviesInfo);
+                    for (let i = 0; i < keys.length; i++) {
+                        let key = keys[i];
+                        let album = {
+                            id: i + 1,
+                            click_url: moviesInfo[key]['click_url'],
+                            img_url: moviesInfo[key]['img_url'],
+                            name: moviesInfo[key]['name'],
+                            tag: moviesInfo[key]['tag'],
+                            year: moviesInfo[key]['year'],
+                            rate: 0
+                        };
+                        albums.push(album);
+                    }
+                    console.log('albums:', albums);
+                    return albums;
+                    },
                 back_loginpage() {
                     window.location.href = 'login.html';
                 },
@@ -334,6 +371,6 @@
             },
         });
     </script>
-</body>
+    </body>
 
 </html>
