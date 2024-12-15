@@ -67,7 +67,7 @@ def execute_spark_submit(task_uuid: str,
     return "SUBMITTED"
 
 
-@app.route('/start-task', methods=['POST'])
+@app.route('/apis/v1/start-task', methods=['POST'])
 @cross_origin(origin='*')
 # only allow application/json content type
 def start_task():
@@ -97,7 +97,7 @@ def start_task():
     return jsonify({"task_id": task_id})
 
 
-@app.route('/get-result/<task_id>', methods=['GET'])
+@app.route('/apis/v1/get-result/<task_id>', methods=['GET'])
 @cross_origin(origin='*')
 def get_result(task_id):
     if results[task_id]['status'] == 'running':
@@ -111,7 +111,7 @@ def get_result(task_id):
     else:
         return jsonify({"error": "Task not found"}), 404
 
-@app.route('/delete-result/<task_id>', methods=['DELETE'])
+@app.route('/apis/v1/delete-result/<task_id>', methods=['DELETE'])
 @cross_origin(origin='*')
 def delete_result(task_id):
     if results[task_id]['status'] == 'completed':
@@ -122,7 +122,7 @@ def delete_result(task_id):
     else:
         return jsonify({"error": "Task not found"}), 404
     
-@app.route('/get-musics-imgurls', methods=['POST'])
+@app.route('/apis/v1/get-musics-imgurls', methods=['POST'])
 @cross_origin(origin='*')
 def get_musics_urls():
     if request.content_type != 'application/json':
@@ -138,12 +138,12 @@ def get_musics_urls():
     #     music_urls[music_id] = f"https://music.163.com/song/media/outer/url?id={music_id}.mp3"
     # return jsonify(music_urls)
     
-@app.route('/get-musics-count', methods=['GET'])
+@app.route('/apis/v1/get-musics-count', methods=['GET'])
 @cross_origin(origin='*')
 def get_musics_count():
     return jsonify({"max_id":CONFIG_JSON['max_id']})
 
-@app.route('/get-musics-info', methods=['GET'])
+@app.route('/apis/v1/get-musics-info', methods=['GET'])
 @cross_origin(origin='*')
 def get_musics_info():
     if request.content_type != 'application/json':
