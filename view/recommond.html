@@ -313,6 +313,7 @@
                             year: moviesInfo[key]['year'],
                             rate: 0
                         };
+                        album.img_url ='http://127.0.0.1:5000/apis/v1/get-image/' + encodeURIComponent(moviesInfo[key]['img_url']);
                         albums.push(album);
                     }
                     console.log('albums:', albums);

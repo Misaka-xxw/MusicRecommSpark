@@ -3,6 +3,12 @@ import asyncio
 import uuid
 import time
 import json
+import urllib.parse
+from io import BytesIO
+import requests
+import traceback
+import imghdr
+
 from flask import Flask, request, jsonify, send_file, redirect
 from flask_cors import CORS, cross_origin
 
@@ -61,6 +67,7 @@ def execute_spark_submit(task_uuid: str,
 
     # Run the task in a separate thread
     import threading
+
     thread = threading.Thread(target=background_task)
     thread.start()
 
@@ -211,6 +218,29 @@ def index():
     return redirect('/recommend.html')
 
 
+# proxy for douban image (to bypass cross-origin issue)
+@app.route('/apis/v1/get-image/<path:encoded_url>', methods=['GET'])
+@cross_origin(origin='*')
+def get_image(encoded_url):
+    try:
+        print(encoded_url)
+        decoded_url = urllib.parse.unquote(encoded_url)
+        print(decoded_url)
+        # use user-agent otherwise douban will limit request number per second
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'}
+        response = requests.get(decoded_url, headers=headers)
+        # note: Some douban images have mis-behavior, it returns 304 redirect, while respond an image file.
+        # some images do not return a content-type in response header
+        content = response.content
 
+        image_file_suffix = decoded_url.split('.')[-1]
+        # only jpeg and gif, not png from douban server.
+        mimetype = f"image/jpeg" if image_file_suffix == "jpg" else f"image/{image_file_suffix}"
+        return send_file(BytesIO(content),mimetype=mimetype)
+
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": "Invalid URL"}), 400
+    
 if __name__ == "__main__":
     app.run(debug=True)
