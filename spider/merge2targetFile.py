@@ -6,24 +6,33 @@ import os
 import random
 import datetime
 
-INPUT_JSON_PATH = '/home/user/Desktop/Files/University/G3T1/BigData/MusicRecommSpark/spider/merged_data.json'
+INPUT_JSON_PATH = '/home/ubuntu/Desktop/BigData/MusicRecommSpark/spider/merged_data.json'
 
-OUTPUT_DIRECTORY = '/home/user/Desktop/Files/University/G3T1/BigData/MusicRecommSpark/dataset'
+OUTPUT_DIRECTORY = '/home/ubuntu/Desktop/BigData/MusicRecommSpark/dataset'
 
 INPUT_POINTER = open(INPUT_JSON_PATH, 'r')
 OUTPUT_RATINGS_POINTER = open(os.path.join(OUTPUT_DIRECTORY, 'ratings.dat'), 'w')
 OUTPUT_MOVIES_POINTER = open(os.path.join(OUTPUT_DIRECTORY, 'movies.dat'), 'w')
+OUTPUT_MUSIC_DATA_POINTER = open(os.path.join(OUTPUT_DIRECTORY, 'musicData.json'), 'w')
 
+random.seed(20241215)
 # 读取merged JSON文件
 merged_data = json.load(INPUT_POINTER)
 
+# 生成movies.dat文件 and musicData.json
 movie_id_idx = 1
+music_data = {}
 for movie in merged_data:
     OUTPUT_MOVIES_POINTER.write(str(movie_id_idx) + '::' + movie['title'] + ' (' + movie['date'][0:4] + ')'+'::' + movie['tag'] + '\n')
+    music_data[str(movie_id_idx)] = {"name": movie['title'], "year": movie['date'][0:4], "tag": movie['tag'],
+                                     "img_url": movie['img_link'], "click_url": movie['song_link']}
     movie_id_idx += 1
-    
+
+music_data['max_id'] = movie_id_idx - 1
+json.dump(music_data, OUTPUT_MUSIC_DATA_POINTER, indent=4, ensure_ascii=False)
 OUTPUT_MOVIES_POINTER.close()
 
+# 生成ratings.dat文件
 used_movie_id = set()
 
 user_id_idx = 1
@@ -42,4 +51,9 @@ OUTPUT_RATINGS_POINTER.close()
 
 unused_movie_ids = set(range(1, movie_id_idx)) - used_movie_id
 
+print("If the below line is not empty set, which means some movies are not included in the ratings.dat.")
+print("Missing movies will cause the ALS model to fail.")
 print(unused_movie_ids)
+
+
+

@@ -2,11 +2,18 @@
 import asyncio
 import uuid
 import time
+import json
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 
 PERSONAL_RATINGS_CACHE_PATH = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/personal_ratings_cache"
+MUSIC_DATA_CONFIG_JSON_PATH = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/dataset/musicData.json"
+
+with open (MUSIC_DATA_CONFIG_JSON_PATH, "r") as file:
+    CONFIG_JSON = json.load(file)
 
 app = Flask(__name__)
+CORS(app)
 
 # Dict to store results
 results = {}
@@ -26,6 +33,9 @@ def execute_spark_submit(task_uuid: str,
                          personal_ratings_path: str = "/hadoop/movie_recommend/personalRatings.dat",
                          training_data_path: str = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/dataset/",
                          bestRank: int = 10, bestLambda: int = 5, bestNumIter: int = 10):
+    
+    # set training_data_path to "/home/ubuntu/Desktop/BigData/MusicRecommSpark/dataset_movie_demo/" to run movie demo data
+    # This recommendation will always output 20 recommended movies/msuics, and this is unchangeable.
     command = ["/hadoop/spark-2.4.5-bin-hadoop2.7/bin/spark-submit", "--class", "MovieLensALS",
                "/hadoop/Spark_Recommend-1.0-SNAPSHOT.jar", training_data_path,
                personal_ratings_path, str(bestRank), str(bestLambda), str(bestNumIter)]
@@ -58,6 +68,7 @@ def execute_spark_submit(task_uuid: str,
 
 
 @app.route('/start-task', methods=['POST'])
+@cross_origin(origin='*')
 # only allow application/json content type
 def start_task():
     if request.content_type != 'application/json':
@@ -78,7 +89,7 @@ def start_task():
     # Save personal ratings file, used in spark.
     with open(f"{PERSONAL_RATINGS_CACHE_PATH}/{task_id}.dat", "w") as file:
         file.write(dat_file)
-    excute_result = execute_spark_submit(task_id, personal_ratings_path=f"{PERSONAL_RATINGS_CACHE_PATH}/{task_id}.dat")
+    excute_result = execute_spark_submit(task_uuid = task_id, personal_ratings_path=f"{PERSONAL_RATINGS_CACHE_PATH}/{task_id}.dat")
     if excute_result != "SUBMITTED":
         return jsonify({"error": "Failed to submit the task"}), 500
     
@@ -87,6 +98,7 @@ def start_task():
 
 
 @app.route('/get-result/<task_id>', methods=['GET'])
+@cross_origin(origin='*')
 def get_result(task_id):
     if results[task_id]['status'] == 'running':
         return jsonify({"status": "running",
@@ -100,6 +112,7 @@ def get_result(task_id):
         return jsonify({"error": "Task not found"}), 404
 
 @app.route('/delete-result/<task_id>', methods=['DELETE'])
+@cross_origin(origin='*')
 def delete_result(task_id):
     if results[task_id]['status'] == 'completed':
         del results[task_id]
@@ -110,6 +123,7 @@ def delete_result(task_id):
         return jsonify({"error": "Task not found"}), 404
     
 @app.route('/get-musics-imgurls', methods=['POST'])
+@cross_origin(origin='*')
 def get_musics_urls():
     if request.content_type != 'application/json':
         return jsonify({"error": "Content type must be application/json"}), 400
@@ -124,5 +138,34 @@ def get_musics_urls():
     #     music_urls[music_id] = f"https://music.163.com/song/media/outer/url?id={music_id}.mp3"
     # return jsonify(music_urls)
     
+@app.route('/get-musics-count', methods=['GET'])
+@cross_origin(origin='*')
+def get_musics_count():
+    return jsonify({"max_id":CONFIG_JSON['max_id']})
+
+@app.route('/get-musics-info', methods=['GET'])
+@cross_origin(origin='*')
+def get_musics_info():
+    if request.content_type != 'application/json':
+        return jsonify({"error": "Content type must be application/json"}), 400
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid JSON"}), 400
+
+    music_ids = data
+    if not all(isinstance(music_id, int) for music_id in music_ids):
+        return jsonify({"error": "All music IDs must be integers"}), 400
+
+    music_info = {}
+    for music_id in music_ids:
+        music_detail = CONFIG_JSON[str(music_id)]
+        if music_detail:
+            music_info[str(music_id)] = music_detail
+        else:
+            music_info[str(music_id)] = "Music ID not found"
+
+    return jsonify(music_info)
+
 if __name__ == "__main__":
     app.run(debug=True)
