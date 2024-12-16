@@ -111,9 +111,11 @@ def get_result(task_id):
         return jsonify({"status": "running",
                         "start_timestamp": results[task_id]['start_timestamp']})
     elif results[task_id]['status'] == 'completed':
+        data = split_stdout(results[task_id]['stdout'])
         return jsonify({"status": "completed",
                         "stdout": results[task_id]['stdout'],
                         "stderr": results[task_id]['stderr'],
+                        "data": data,
                         "elapsed_time": results[task_id]['elapsed_time']})   
     else:
         return jsonify({"error": "Task not found"}), 404
@@ -193,6 +195,12 @@ def get_index_js():
     JS_PATH_INDEX = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/index.js"
     return send_file(JS_PATH_INDEX, mimetype='text/javascript')
 
+@app.route('/css/my_func.js', methods=['GET'])
+@cross_origin(origin='*')
+def get_my_func_js():
+    JS_PATH_INDEX = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/my_func.js"
+    return send_file(JS_PATH_INDEX, mimetype='text/javascript')
+
 @app.route('/css/fonts/element-icons.woff', methods=['GET'])
 @cross_origin(origin='*')
 def get_element_icons_woff():
@@ -241,6 +249,16 @@ def get_image(encoded_url):
     except Exception as e:
         print(traceback.format_exc())
         return jsonify({"error": "Invalid URL"}), 400
-    
+
+def split_stdout(s:str)->list[str]:
+    """Parsing stdout as an array of dictionaries"""
+    lines=s.split("\n")
+    res=[]
+    for i in range(2,len(lines)):
+        word=lines[i].split(":")
+        if len(word)>2:
+            res.append({'user_id':word[0],'movie_id':word[1],'rating':word[2],'name':word[3]})
+    return res
+
 if __name__ == "__main__":
     app.run(debug=True)

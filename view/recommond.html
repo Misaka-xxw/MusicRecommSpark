@@ -19,7 +19,9 @@
         .album img {
             width: 100%;
             height: 300px;
+            object-fit: cover;
             border-radius: 8px;
+            background-color: #f0f0f0;
         }
 
         .album-info {
@@ -120,8 +122,8 @@
                     </div>
                     <div class="album-info" @click="openUrl(album.url)">
                         <h3>{{ album.name }}</h3>
-                        <p>简介：{{ album.description }}</p>
-                        <p>作者：{{ album.raw }}</p>
+                        <p>标签：{{ album.tag }}</p>
+                        <p>年份：{{ album.year }}</p>
                     </div>
                 </div>
             </div>
@@ -143,6 +145,7 @@
         <!-- Currently https://unpkg.com/element-ui/lib/index.js redirects to  https://unpkg.com/element-ui@2.15.14/lib/index.js -->
         <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/index.js -->
         <script src="http://127.0.0.1:5000/css/index.js"></script>
+        <script src="http://127.0.0.1:5000/css/my_func.js"></script>
         <script>
         new Vue({
             el: '#app',
@@ -154,93 +157,95 @@
                     button_text: '打好分了，开始推荐🌟',
                     title: '🎹音乐打分🎵',
                     maxId: null,
+                    task_id:null,
                     albums: [{
                         id:1,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
-                        rate: 0
-                    }, {
+                        name: "loading",
+                        tag: "",
+                        year: "",
+                        rate: 0,
+                    },
+                    {
                         id:2,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
+                        name: "loading",
+                        tag: "",
+                        year: "",
                         rate: 0
                     }, 
                     {
                         id:3,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
+                        name: "loading",
+                        tag: "",
+                        year: "",
                         rate: 0
                     }, 
                     {
                         id:4,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
+                        name: "loading",
+                        tag: "",
+                        year: "",
                         rate: 0
                     }, 
                     {
                         id:5,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
+                        name: "loading",
+                        tag: "",
+                        year: "",
                         rate: 0
                     }, 
                     {
                         id:6,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
+                        name: "loading",
+                        tag: "",
+                        year: "",
                         rate: 0
                     }, 
                     {
                         id:7,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
+                        name: "loading",
+                        tag: "",
+                        year: "",
                         rate: 0
                     }, 
                     {
                         id:8,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
+                        name: "loading",
+                        tag: "",
+                        year: "",
                         rate: 0
                     }, 
                     {
                         id:9,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
+                        name: "loading",
+                        tag: "",
+                        year: "",
                         rate: 0
                     }, 
                     {
                         id:10,
-                        click_url: "https://music.douban.com/subject/6846847/",
+                        click_url: "",
                         img_url: "",
-                        name: "Ravel Shéhérazade",
-                        tag: "古典",
-                        year: "1991",
+                        name: "loading",
+                        tag: "",
+                        year: "",
                         rate: 0
                     }, ]
                 }
@@ -269,7 +274,7 @@
                     return this.maxId;
                 },
                 async getRandomMusicID() {
-                    let randomIds = new Set();
+                    let randomIds = new Set(); // no repeat!
                     while (randomIds.size < 10) {
                         let rand = Math.floor(Math.random() * this.maxId) + 1;
                         console.log('rand:', rand);
@@ -318,7 +323,7 @@
                     }
                     console.log('albums:', albums);
                     return albums;
-                    },
+                },
                 back_loginpage() {
                     window.location.href = 'login.html';
                 },
@@ -326,11 +331,20 @@
                     window.location.href = 'index.html';
                 },
                 async submit() {
+                    if (this.albums.some(album => album.rate === 0)) {
+                        error_dialog.call(this, '请为所有音乐打分后再提交');
+                        this.loading = false;
+                        return;
+                    }
                     this.loading = true;
                     if (this.mode) {
                         this.button_text = '正在推荐中...';
-                        const result = await this.startTask();
-                        console.log(result);
+                        const task_id_json = await this.startTask();
+                        this.task_id=task_id_json['task_id'];
+                        console.log('task_id:', this.task_id);
+                        // wait for the task to complete, about 30~40 seconds
+                        const task_result=await this.getTaskResult(this.task_id);
+                        console.log('task_result:',task_result);
                     } else {
                         // 结果模式
                     }
@@ -343,14 +357,37 @@
                     }
                 },
                 async startTask() {
-                    const data = {
-                        personal_ratings: [
-                            { user_id: 1, movie_id: 101, rating: 5, timestamp: 1234567890 },
-                            { user_id: 1, movie_id: 101, rating: 5, timestamp: 1234567890 },
-                            { user_id: 1, movie_id: 102, rating: 3, timestamp: 1234567891 }
+                    //format example:
+                    /*
+                    {
+                        "personal_ratings": [
+                            {
+                                "user_id": 1,
+                                "movie_id": 1,
+                                "rating": 5,
+                                "timestamp": 123456789
+                            },
+                            {
+                                "user_id": 1,
+                                "movie_id": 2,
+                                "rating": 4,
+                                "timestamp": 123456789
+                            }
                         ]
+                    }
+                    */
+                    const data = {
+                        personal_ratings: this.albums.map(album => ({
+                            user_id: 1,// wait to replace with the actual user ID
+                            movie_id: album.id,
+                            rating: album.rate,
+                            timestamp: Date.now()
+                        }))
                     };
-                    const response = await fetch('http://127.0.0.1:5000/start-task', {
+                    console.log("start task data:",data);
+                    //const jsonString = JSON.stringify(data);
+                    //console.log("start task json string",jsonString);
+                    const response = await fetch('http://127.0.0.1:5000/apis/v1/start-task', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -358,6 +395,40 @@
                         body: JSON.stringify(data)
                     });
                     return response.json();
+                },
+                async getTaskResult(task_id) {
+                    try {
+                        let isCompleted = false;
+                        while (!isCompleted) {
+                            const response = await fetch('http://127.0.0.1:5000/apis/v1/get-result/' + task_id,
+                            {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            }); 
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            const data = await response.json();
+                            if (data.status === 'completed') {
+                                console.log('Task completed:', data);
+                                // Handle the completed task result
+                                isCompleted = true;
+                                return data;
+                            } else if (data.status === 'running') {
+                                console.log('Task is still running...');
+                                // Wait before polling again
+                                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+                            } else {
+                                console.error('Error:', data);
+                                isCompleted = true;
+                                return data;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error fetching task result:', error);
+                    }
                 },
                 async getFlask(url) {
                     const response = await fetch(url, {
