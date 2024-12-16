@@ -250,14 +250,16 @@ def get_image(encoded_url):
         print(traceback.format_exc())
         return jsonify({"error": "Invalid URL"}), 400
 
-def split_stdout(s:str)->list[str]:
+def split_stdout(s: str) -> list[dict]:
     """Parsing stdout as an array of dictionaries"""
-    lines=s.split("\n")
-    res=[]
-    for i in range(2,len(lines)):
-        word=lines[i].split(":")
-        if len(word)>2:
-            res.append({'user_id':word[0],'movie_id':word[1],'rating':word[2],'name':word[3]})
+    lines = s.split("\n")
+    res = []
+    for i in range(2, len(lines)):
+        word = lines[i].split(":")
+        if len(word) > 2:
+            res.append({'user_id': word[0], 'movie_id': word[1], 'rating': word[2], 'name': word[3]})
+    # Sort the result by rating in descending order
+    res.sort(key=lambda x: float(x['rating']), reverse=True)
     return res
 
 if __name__ == "__main__":

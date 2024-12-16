@@ -110,15 +110,15 @@
                     🎹音乐推荐系统🎵
                     <br />
                 </div>
-                <h4 style="text-align: center;">请为以下音乐打分</h4>
+                <h4 style="text-align: center;">{{ prompt_text }}</h4>
             </div>
             <div class="albums-container">
                 <div class="album" v-for="album in albums" :key="album.id">
                     <el-image :src="album.img_url" fit="cover"
                         @click="openUrl(album.click_url)"></el-image>
                     <div>
-                        <el-rate v-model="album.rate" v-show="mode"
-                            show-text></el-rate>
+                        <el-rate v-model="album.rate" v-show="mode" size="large" show-text></el-rate>
+                        <!-- <el-rate v-model="album.rate" v-show="!mode" size="large" disabled show-score></el-rate> -->
                     </div>
                     <div class="album-info" @click="openUrl(album.url)">
                         <h3>{{ album.name }}</h3>
@@ -154,6 +154,7 @@
                     username: 'admin',
                     loading: false,
                     mode: true, //true表示打分模式，false表示结果模式
+                    prompt_text:"请为以下音乐打分",
                     button_text: '打好分了，开始推荐🌟',
                     title: '🎹音乐打分🎵',
                     maxId: null,
@@ -251,20 +252,21 @@
                 }
             },
             async created() {
-                this.username = localStorage.getItem('username') || '未登录';
+                this.username = localStorage.getItem('username') || '未登录';        
                 let maxId = await this.getMaxId();
-                console.log('maxID:', maxId); // This console.log can not run.
-
-                let randomIds = await this.getRandomMusicID();
-
-                let requestInfoResult = await this.getMoviesInfo(randomIds);
-                // console.log('requestInfoResult:', requestInfoResult);
-                this.albums = await this.moviesInfo2Albums(requestInfoResult);
-                
+                console.log('maxID:', maxId); // This console.log can not run.   
+                await this.initPage();
             },
             methods: {
                 openUrl(url) {
                     window.open(url, '_blank');
+                },
+                async initPage(){
+                    let randomIds = await this.getRandomMusicID();
+                    let requestInfoResult = await this.getMoviesInfo(randomIds);
+                    // console.log('requestInfoResult:', requestInfoResult);
+                    this.albums = await this.moviesInfo2Albums(requestInfoResult);
+                    correct_dialog.call(this, '音乐加载完成');
                 },
                 async getMaxId() {
                     let msg1 = await this.getFlask('http://127.0.0.1:5000/apis/v1/get-musics-count');
@@ -331,29 +333,45 @@
                     window.location.href = 'index.html';
                 },
                 async submit() {
-                    if (this.albums.some(album => album.rate === 0)) {
-                        error_dialog.call(this, '请为所有音乐打分后再提交');
-                        this.loading = false;
-                        return;
-                    }
+                    
                     this.loading = true;
-                    if (this.mode) {
+                    if (this.mode) { // 打分模式
+                        if (this.albums.some(album => album.rate === 0)) {
+                            error_dialog.call(this, '请为所有音乐打分后再提交');
+                            this.loading = false;
+                            return;
+                        }
                         this.button_text = '正在推荐中...';
                         const task_id_json = await this.startTask();
                         this.task_id=task_id_json['task_id'];
                         console.log('task_id:', this.task_id);
+
                         // wait for the task to complete, about 30~40 seconds
                         const task_result=await this.getTaskResult(this.task_id);
+                        
                         console.log('task_result:',task_result);
-                    } else {
-                        // 结果模式
+                        correct_dialog.call(this, '推荐完成');
+                        
+                        let recommendedMusicIds = task_result.data.map(item => parseInt(item.movie_id));
+                        let recommendedMusicRate = task_result.data.map(item => parseFloat(item.rating));
+                        let requestInfoResult = await this.getMoviesInfo(recommendedMusicIds);
+                        console.log('requestInfoResult:', requestInfoResult);
+                        this.albums = await this.moviesInfo2Albums(requestInfoResult);
+                        for(var i=0;i<this.albums.length;i++){
+                            this.albums[i].rate=recommendedMusicRate[i];
+                        }
+                        console.log('albums:', this.albums);
+                    } else { // 结果模式
+                        await this.initPage();           
                     }
                     this.loading = false;
-                    this.mode = 1 - this.mode;
-                    if (this.mode) {
+                    this.mode = !this.mode; // not this.mode = 1-this.mode;
+                    if (!this.mode) {
                         this.button_text = '重新打分和推荐🔁'
+                        this.prompt_text = "以下是为您推荐的音乐";
                     } else {
                         this.button_text = '打好分了，开始推荐🌟'
+                        this.prompt_text = "请为以下音乐打分";
                     }
                 },
                 async startTask() {

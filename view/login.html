@@ -45,6 +45,9 @@
             <el-form-item label="用户名" prop="username">
                 <el-input v-model="loginForm.username" clearable></el-input>
             </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+                <el-input v-model="loginForm.email" clearable></el-input>
+            </el-form-item>
             <el-form-item label="密码" prop="password">
                 <el-input type="password" v-model="loginForm.password" clearable></el-input>
             </el-form-item>
@@ -71,6 +74,11 @@
                         username: [{
                             required: true,
                             message: '请输入用户名',
+                            trigger: 'blur'
+                        }],
+                        email: [{
+                            required: true,
+                            message: '请输入邮箱',
                             trigger: 'blur'
                         }],
                         password: [{
