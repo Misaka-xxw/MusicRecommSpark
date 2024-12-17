@@ -8,17 +8,49 @@ from io import BytesIO
 import requests
 import traceback
 import imghdr
+import sqlite3
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from flask import Flask, request, jsonify, send_file, redirect, send_from_directory
+from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, session
 from flask_cors import CORS, cross_origin
+
+from functools import wraps
 
 PERSONAL_RATINGS_CACHE_PATH = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/personal_ratings_cache"
 MUSIC_DATA_CONFIG_JSON_PATH = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/dataset/musicData.json"
+DATABASE = '/home/ubuntu/Desktop/BigData/MusicRecommSpark/flask/users.db'
 
+# Init database
+def init_db():
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
+
+init_db()
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return redirect('/login.html?msg=login_required')   
+        return f(*args, **kwargs)
+    return decorated_function
+# Load music dataset
 with open (MUSIC_DATA_CONFIG_JSON_PATH, "r") as file:
     CONFIG_JSON = json.load(file)
 
+
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'
+app.config['SESSION_TYPE'] = 'filesystem'
 CORS(app)
 
 # Dict to store results
@@ -76,6 +108,7 @@ def execute_spark_submit(task_uuid: str,
 
 @app.route('/apis/v1/start-task', methods=['POST'])
 @cross_origin(origin='*')
+@login_required
 # only allow application/json content type
 def start_task():
     if request.content_type != 'application/json':
@@ -106,6 +139,7 @@ def start_task():
 
 @app.route('/apis/v1/get-result/<task_id>', methods=['GET'])
 @cross_origin(origin='*')
+@login_required
 def get_result(task_id):
     if results[task_id]['status'] == 'running':
         return jsonify({"status": "running",
@@ -122,6 +156,7 @@ def get_result(task_id):
 
 @app.route('/apis/v1/delete-result/<task_id>', methods=['DELETE'])
 @cross_origin(origin='*')
+@login_required
 def delete_result(task_id):
     if results[task_id]['status'] == 'completed':
         del results[task_id]
@@ -149,11 +184,13 @@ def delete_result(task_id):
     
 @app.route('/apis/v1/get-musics-count', methods=['GET'])
 @cross_origin(origin='*')
+@login_required
 def get_musics_count():
     return jsonify({"max_id":CONFIG_JSON['max_id']})
 
 @app.route('/apis/v1/get-musics-info', methods=['POST'])
 @cross_origin(origin='*')
+@login_required
 def get_musics_info():
     if request.content_type != 'application/json':
         return jsonify({"error": "Content type must be application/json"}), 400
@@ -223,8 +260,9 @@ def get_static_files(filename):
 # HTML pages in website
 @app.route('/recommend.html', methods=['GET'])
 @cross_origin(origin='*')
+@login_required
 def get_recommend_page():
-    HTML_PATH_RECOMMEND = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/recommond.html"
+    HTML_PATH_RECOMMEND = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/recommend.html"
     return send_file(HTML_PATH_RECOMMEND)
 
 @app.route('/', methods=['GET'])
@@ -247,6 +285,7 @@ def get_login_page():
 # proxy for douban image (to bypass cross-origin issue)
 @app.route('/apis/v1/get-image/<path:encoded_url>', methods=['GET'])
 @cross_origin(origin='*')
+@login_required
 def get_image(encoded_url):
     try:
         print(encoded_url)
@@ -280,5 +319,85 @@ def split_stdout(s: str) -> list[dict]:
     res.sort(key=lambda x: float(x['rating']), reverse=True)
     return res
 
+# Account register and login
+@app.route('/apis/v1/register', methods=['POST'])
+@cross_origin(origin='*')
+def register():
+    if request.content_type != 'application/json':
+        return jsonify({"error": "Content type must be application/json",
+                        "status": "error"}), 400
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "Invalid JSON", "status": "error"}), 400
+
+    username = data.get('username')
+    password = data.get('password')
+    email = data.get('email')
+
+    if not username or not password or not email:
+        return jsonify({"message": "Username, password and email are required",
+                        "status": "error"}), 400
+
+    hashed_password = generate_password_hash(password)
+
+    try:
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (username, email, hashed_password))
+            conn.commit()
+    except sqlite3.IntegrityError:
+        return jsonify({"message": "User already exists",
+                        "status": "error"}), 400
+
+    return jsonify({"message": "User registered successfully",
+                    "status": "success"}), 201
+
+@app.route('/apis/v1/login', methods=['POST'])
+@cross_origin(origin='*')
+def login():
+    if request.content_type != 'application/json':
+        return jsonify({"message": "Content type must be application/json",
+                        "status":"error"}), 400
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "Invalid JSON",
+                        "status":"error"}), 400
+
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({"message": "Username and password are required",
+                        "status":"error"}), 400
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT password FROM users WHERE username = ?', (username,))
+        row = cursor.fetchone()
+
+    if row is None or not check_password_hash(row[0], password):
+        return jsonify({"message": "Invalid username or password",
+                        "status":"error"}), 400
+
+    session['username'] = username
+    return jsonify({"message": "Logged in successfully",
+                    "status":"success"}), 200
+
+@app.route('/apis/v1/logout', methods=['POST'])
+@cross_origin(origin='*')
+@login_required
+def logout():
+    session.pop('username', None)
+    return jsonify({"message": "Logged out successfully",
+                    "status":"success"}), 200
+# test APIs
+@app.route('/apis/v1/test-login-required', methods=['GET'])
+@cross_origin(origin='*')
+@login_required
+def test_login_required():
+    return jsonify({"message": "You are logged in",
+                    "status":"success"}), 200
 if __name__ == "__main__":
     app.run(debug=True)

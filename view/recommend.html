@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>🎹音乐推荐系统🎵</title>
-        <!-- currently https://unpkg.com/element-ui/lib/theme-chalk/index.css redirects to  https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css -->
-        <!-- saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/element-ui.css -->
-        <link rel="stylesheet" href="http://127.0.0.1:5000/css/element-ui.css">
-        <style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎹音乐推荐系统🎵</title>
+    <!-- currently https://unpkg.com/element-ui/lib/theme-chalk/index.css redirects to  https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css -->
+    <!-- saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/element-ui.css -->
+    <link rel="stylesheet" href="http://127.0.0.1:5000/css/element-ui.css">
+    <style>
         .album {
             position: relative;
             width: 300px;
@@ -94,59 +94,58 @@
             height: auto;
         }
     </style>
-    </head>
+</head>
 
-    <body>
-        <div id="app" v-loading="loading">
-            <div class="header">
-                <div class="admin">
-                    账号：{{ username }}
-                    <el-button class="custom-button" @click="back_loginpage()">
-                        登录或注册 </el-button>
-                    <el-button class="custom-button" @click="back_homepage()">
-                        返回主页 </el-button>
-                </div>
-                <div class="page-title">
-                    🎹音乐推荐系统🎵
-                    <br />
-                </div>
-                <h4 style="text-align: center;">{{ prompt_text }}</h4>
+<body>
+    <div id="app" v-loading="loading">
+        <div class="header">
+            <div class="admin">
+                账号：{{ username }}
+
+                <el-button v-if="username === '未登录'" class="custom-button" @click="back_loginpage()">
+                    登录或注册 </el-button>
+                <el-button v-else class="custom-button" @click="logout()">退出登录</el-button>
+
+                <el-button class="custom-button" @click="back_homepage()">
+                    返回主页 </el-button>
             </div>
-            <div class="albums-container">
-                <div class="album" v-for="album in albums" :key="album.id">
-                    <el-image :src="album.img_url" fit="cover"
-                        @click="openUrl(album.click_url)"></el-image>
-                    <div>
-                        <el-rate v-model="album.rate" v-show="mode" size="large" show-text></el-rate>
-                        <!-- <el-rate v-model="album.rate" v-show="!mode" size="large" disabled show-score></el-rate> -->
-                    </div>
-                    <div class="album-info" @click="openUrl(album.url)">
-                        <h3>{{ album.name }}</h3>
-                        <p>歌手：{{ album.singer }}</p>
-                        <p>标签：{{ album.tag }}   年份：{{ album.year }}</p>
-                    </div>
-                </div>
+            <div class="page-title">
+                🎹音乐推荐系统🎵
+                <br />
             </div>
-            <div class="button-container">
-                <el-button type="primary"
-                    style="justify-content: center;align-items: center;"
-                    @click="submit()">
-                    <p
-                        style="font-size: 20px;font-weight: bold;text-align: center;">
-                        {{button_text}}
-                    </p>
-                </el-button>
-            </div>
-            <img src="static/miku.gif" alt="Fixed GIF" class="fixed-gif" />
+            <h4 style="text-align: center;">{{ prompt_text }}</h4>
         </div>
-        <!-- Currently https://unpkg.com/vue@2/dist/vue.js redirects to https://unpkg.com/vue@2.7.16/dist/vue.js -->
-        <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/vue.js-->
-        <script src="http://127.0.0.1:5000/css/vue.js"></script>
-        <!-- Currently https://unpkg.com/element-ui/lib/index.js redirects to  https://unpkg.com/element-ui@2.15.14/lib/index.js -->
-        <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/index.js -->
-        <script src="http://127.0.0.1:5000/css/index.js"></script>
-        <script src="http://127.0.0.1:5000/css/my_func.js"></script>
-        <script>
+        <div class="albums-container">
+            <div class="album" v-for="album in albums" :key="album.id">
+                <el-image :src="album.img_url" fit="cover" @click="openUrl(album.click_url)"></el-image>
+                <div>
+                    <el-rate v-model="album.rate" v-show="mode" size="large" show-text></el-rate>
+                    <!-- <el-rate v-model="album.rate" v-show="!mode" size="large" disabled show-score></el-rate> -->
+                </div>
+                <div class="album-info" @click="openUrl(album.url)">
+                    <h3>{{ album.name }}</h3>
+                    <p>歌手：{{ album.singer }}</p>
+                    <p>标签：{{ album.tag }} 年份：{{ album.year }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="button-container">
+            <el-button type="primary" style="justify-content: center;align-items: center;" @click="submit()">
+                <p style="font-size: 20px;font-weight: bold;text-align: center;">
+                    {{button_text}}
+                </p>
+            </el-button>
+        </div>
+        <img src="static/miku.gif" alt="Fixed GIF" class="fixed-gif" />
+    </div>
+    <!-- Currently https://unpkg.com/vue@2/dist/vue.js redirects to https://unpkg.com/vue@2.7.16/dist/vue.js -->
+    <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/vue.js-->
+    <script src="http://127.0.0.1:5000/css/vue.js"></script>
+    <!-- Currently https://unpkg.com/element-ui/lib/index.js redirects to  https://unpkg.com/element-ui@2.15.14/lib/index.js -->
+    <!-- This is saved locally on  /home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/index.js -->
+    <script src="http://127.0.0.1:5000/css/index.js"></script>
+    <script src="http://127.0.0.1:5000/css/my_func.js"></script>
+    <script>
         new Vue({
             el: '#app',
             data() {
@@ -154,13 +153,13 @@
                     username: 'admin',
                     loading: false,
                     mode: true, //true表示打分模式，false表示结果模式
-                    prompt_text:"请为以下音乐打分",
+                    prompt_text: "请为以下音乐打分",
                     button_text: '打好分了，开始推荐🌟',
                     title: '🎹音乐打分🎵',
                     maxId: null,
-                    task_id:null,
+                    task_id: null,
                     albums: [{
-                        id:1,
+                        id: 1,
                         click_url: "",
                         img_url: "",
                         name: "loading",
@@ -169,90 +168,90 @@
                         rate: 0,
                     },
                     {
-                        id:2,
+                        id: 2,
                         click_url: "",
                         img_url: "",
                         name: "loading",
                         tag: "",
                         year: "",
                         rate: 0
-                    }, 
+                    },
                     {
-                        id:3,
+                        id: 3,
                         click_url: "",
                         img_url: "",
                         name: "loading",
                         tag: "",
                         year: "",
                         rate: 0
-                    }, 
+                    },
                     {
-                        id:4,
+                        id: 4,
                         click_url: "",
                         img_url: "",
                         name: "loading",
                         tag: "",
                         year: "",
                         rate: 0
-                    }, 
+                    },
                     {
-                        id:5,
+                        id: 5,
                         click_url: "",
                         img_url: "",
                         name: "loading",
                         tag: "",
                         year: "",
                         rate: 0
-                    }, 
+                    },
                     {
-                        id:6,
+                        id: 6,
                         click_url: "",
                         img_url: "",
                         name: "loading",
                         tag: "",
                         year: "",
                         rate: 0
-                    }, 
+                    },
                     {
-                        id:7,
+                        id: 7,
                         click_url: "",
                         img_url: "",
                         name: "loading",
                         tag: "",
                         year: "",
                         rate: 0
-                    }, 
+                    },
                     {
-                        id:8,
+                        id: 8,
                         click_url: "",
                         img_url: "",
                         name: "loading",
                         tag: "",
                         year: "",
                         rate: 0
-                    }, 
+                    },
                     {
-                        id:9,
+                        id: 9,
                         click_url: "",
                         img_url: "",
                         name: "loading",
                         tag: "",
                         year: "",
                         rate: 0
-                    }, 
+                    },
                     {
-                        id:10,
+                        id: 10,
                         click_url: "",
                         img_url: "",
                         name: "loading",
                         tag: "",
                         year: "",
                         rate: 0
-                    }, ]
+                    },]
                 }
             },
             async created() {
-                this.username = localStorage.getItem('username') || '未登录';        
+                this.username = localStorage.getItem('username') || '未登录';
                 let maxId = await this.getMaxId();
                 console.log('maxID:', maxId); // This console.log can not run.   
                 await this.initPage();
@@ -261,7 +260,7 @@
                 openUrl(url) {
                     window.open(url, '_blank');
                 },
-                async initPage(){
+                async initPage() {
                     let randomIds = await this.getRandomMusicID();
                     let requestInfoResult = await this.getMoviesInfo(randomIds);
                     // console.log('requestInfoResult:', requestInfoResult);
@@ -290,7 +289,7 @@
                     let idsArray = Array.from(randomIds);
                     console.log(idsArray);
                     // Use "get movie info" API to post these numbers as JSON to the server
-                    try{
+                    try {
                         const response = await fetch('http://127.0.0.1:5000/apis/v1/get-musics-info', {
                             method: 'POST',
                             headers: {
@@ -301,7 +300,7 @@
                         const data = await response.json();
                         console.log('getMovieInfo Return data:', data);
                         return data;
-                    } catch(error) {
+                    } catch (error) {
                         console.error('Error:', error);
                     }
                 },
@@ -321,7 +320,7 @@
                             singer: moviesInfo[key]['singer'],
                             rate: 0
                         };
-                        album.img_url ='http://127.0.0.1:5000/apis/v1/get-image/' + encodeURIComponent(moviesInfo[key]['img_url']);
+                        album.img_url = 'http://127.0.0.1:5000/apis/v1/get-image/' + encodeURIComponent(moviesInfo[key]['img_url']);
                         albums.push(album);
                     }
                     console.log('albums:', albums);
@@ -333,8 +332,23 @@
                 back_homepage() {
                     window.location.href = 'index.html';
                 },
+                async logout() {
+                    const response = await fetch('http://127.0.0.1:5000/apis/v1/logout', {
+                        method: 'POST'
+                    });
+                    const data = await response.json();
+                    if (data['status'] === 'success') {
+                        correct_dialog.call(this, '退出登录成功');
+                        localStorage.removeItem('username');
+                        this.username = '未登录';
+                        window.location.href = 'login.html';
+                    } else {
+                        error_dialog.call(this, 'Error: ' + data['message']);
+                    }
+
+                },
                 async submit() {
-                    
+
                     this.loading = true;
                     if (this.mode) { // 打分模式
                         if (this.albums.some(album => album.rate === 0)) {
@@ -344,26 +358,26 @@
                         }
                         this.button_text = '正在推荐中...';
                         const task_id_json = await this.startTask();
-                        this.task_id=task_id_json['task_id'];
+                        this.task_id = task_id_json['task_id'];
                         console.log('task_id:', this.task_id);
 
                         // wait for the task to complete, about 30~40 seconds
-                        const task_result=await this.getTaskResult(this.task_id);
-                        
-                        console.log('task_result:',task_result);
+                        const task_result = await this.getTaskResult(this.task_id);
+
+                        console.log('task_result:', task_result);
                         correct_dialog.call(this, '推荐完成');
-                        
+
                         let recommendedMusicIds = task_result.data.map(item => parseInt(item.movie_id));
                         let recommendedMusicRate = task_result.data.map(item => parseFloat(item.rating));
                         let requestInfoResult = await this.getMoviesInfo(recommendedMusicIds);
                         console.log('requestInfoResult:', requestInfoResult);
                         this.albums = await this.moviesInfo2Albums(requestInfoResult);
-                        for(var i=0;i<this.albums.length;i++){
-                            this.albums[i].rate=recommendedMusicRate[i];
+                        for (var i = 0; i < this.albums.length; i++) {
+                            this.albums[i].rate = recommendedMusicRate[i];
                         }
                         console.log('albums:', this.albums);
                     } else { // 结果模式
-                        await this.initPage();           
+                        await this.initPage();
                     }
                     this.loading = false;
                     this.mode = !this.mode; // not this.mode = 1-this.mode;
@@ -403,7 +417,7 @@
                             timestamp: Date.now()
                         }))
                     };
-                    console.log("start task data:",data);
+                    console.log("start task data:", data);
                     //const jsonString = JSON.stringify(data);
                     //console.log("start task json string",jsonString);
                     const response = await fetch('http://127.0.0.1:5000/apis/v1/start-task', {
@@ -420,12 +434,12 @@
                         let isCompleted = false;
                         while (!isCompleted) {
                             const response = await fetch('http://127.0.0.1:5000/apis/v1/get-result/' + task_id,
-                            {
-                                method: 'GET',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                }
-                            }); 
+                                {
+                                    method: 'GET',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
                             if (!response.ok) {
                                 throw new Error(`HTTP error! Status: ${response.status}`);
                             }
@@ -462,6 +476,6 @@
             },
         });
     </script>
-    </body>
+</body>
 
 </html>
