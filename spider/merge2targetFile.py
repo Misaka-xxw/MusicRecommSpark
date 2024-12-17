@@ -25,7 +25,7 @@ music_data = {}
 for movie in merged_data:
     OUTPUT_MOVIES_POINTER.write(str(movie_id_idx) + '::' + movie['title'] + ' (' + movie['date'][0:4] + ')'+'::' + movie['tag'] + '\n')
     music_data[str(movie_id_idx)] = {"name": movie['title'], "year": movie['date'][0:4], "tag": movie['tag'],
-                                     "img_url": movie['img_link'], "click_url": movie['song_link']}
+                                     "img_url": movie['img_link'], "click_url": movie['song_link'], "singer": movie['singer']}  
     movie_id_idx += 1
 
 music_data['max_id'] = movie_id_idx - 1

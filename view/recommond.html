@@ -122,8 +122,8 @@
                     </div>
                     <div class="album-info" @click="openUrl(album.url)">
                         <h3>{{ album.name }}</h3>
-                        <p>标签：{{ album.tag }}</p>
-                        <p>年份：{{ album.year }}</p>
+                        <p>歌手：{{ album.singer }}</p>
+                        <p>标签：{{ album.tag }}   年份：{{ album.year }}</p>
                     </div>
                 </div>
             </div>
@@ -318,6 +318,7 @@
                             name: moviesInfo[key]['name'],
                             tag: moviesInfo[key]['tag'],
                             year: moviesInfo[key]['year'],
+                            singer: moviesInfo[key]['singer'],
                             rate: 0
                         };
                         album.img_url ='http://127.0.0.1:5000/apis/v1/get-image/' + encodeURIComponent(moviesInfo[key]['img_url']);

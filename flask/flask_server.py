@@ -9,7 +9,7 @@ import requests
 import traceback
 import imghdr
 
-from flask import Flask, request, jsonify, send_file, redirect
+from flask import Flask, request, jsonify, send_file, redirect, send_from_directory
 from flask_cors import CORS, cross_origin
 
 PERSONAL_RATINGS_CACHE_PATH = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/personal_ratings_cache"
@@ -213,6 +213,13 @@ def get_element_icons_ttf():
     TTF_PATH_ELEMENT_ICONS = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/css/element-icons.ttf"
     return send_file(TTF_PATH_ELEMENT_ICONS)
 
+@app.route('/static/<filename>', methods=['GET'])
+@cross_origin(origin='*')
+def get_static_files(filename):
+    print(filename)
+    STATIC_PATH = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/static"
+    return send_from_directory(STATIC_PATH, filename)
+
 # HTML pages in website
 @app.route('/recommend.html', methods=['GET'])
 @cross_origin(origin='*')
@@ -223,8 +230,19 @@ def get_recommend_page():
 @app.route('/', methods=['GET'])
 @cross_origin(origin='*')
 def index():
-    return redirect('/recommend.html')
+    return redirect('/index.html')
 
+@app.route('/index.html', methods=['GET'])
+@cross_origin(origin='*')
+def get_index_page():
+    HTML_PATH_INDEX = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/index.html"
+    return send_file(HTML_PATH_INDEX)
+
+@app.route('/login.html', methods=['GET'])
+@cross_origin(origin='*')
+def get_login_page():
+    HTML_PATH_LOGIN = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/login.html"
+    return send_file(HTML_PATH_LOGIN)
 
 # proxy for douban image (to bypass cross-origin issue)
 @app.route('/apis/v1/get-image/<path:encoded_url>', methods=['GET'])
