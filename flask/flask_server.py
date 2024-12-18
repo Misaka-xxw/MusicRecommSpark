@@ -282,30 +282,33 @@ def get_login_page():
     HTML_PATH_LOGIN = "/home/ubuntu/Desktop/BigData/MusicRecommSpark/view/login.html"
     return send_file(HTML_PATH_LOGIN)
 
+def getDoubanImage(douban_url):
+    print(douban_url)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'}
+    MAX_RETRIES = 3
+    retries = 0
+    while retries < MAX_RETRIES:
+        response = requests.get(douban_url, headers=headers)
+        if response.status_code == 200:
+            content = response.content
+            image_file_suffix = douban_url.split('.')[-1]
+            mimetype = f"image/jpeg" if image_file_suffix == "jpg" else f"image/{image_file_suffix}"
+            return 200, content, mimetype
+        else:
+            retries = retries+1
+    return 500, False, False
 # proxy for douban image (to bypass cross-origin issue)
 @app.route('/apis/v1/get-image/<path:encoded_url>', methods=['GET'])
 @cross_origin(origin='*')
 @login_required
 def get_image(encoded_url):
-    try:
-        print(encoded_url)
         decoded_url = urllib.parse.unquote(encoded_url)
-        print(decoded_url)
-        # use user-agent otherwise douban will limit request number per second
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'}
-        response = requests.get(decoded_url, headers=headers)
-        # note: Some douban images have mis-behavior, it returns 304 redirect, while respond an image file.
-        # some images do not return a content-type in response header
-        content = response.content
+        status, content, mimetype = getDoubanImage(decoded_url)
+        if status == 200:
+            return send_file(BytesIO(content),mimetype=mimetype)
+        else:
+            return jsonify({"error":"image fetch error."}), 400
 
-        image_file_suffix = decoded_url.split('.')[-1]
-        # only jpeg and gif, not png from douban server.
-        mimetype = f"image/jpeg" if image_file_suffix == "jpg" else f"image/{image_file_suffix}"
-        return send_file(BytesIO(content),mimetype=mimetype)
-
-    except Exception as e:
-        print(traceback.format_exc())
-        return jsonify({"error": "Invalid URL"}), 400
 
 def split_stdout(s: str) -> list[dict]:
     """Parsing stdout as an array of dictionaries"""
