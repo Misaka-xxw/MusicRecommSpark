@@ -146,8 +146,14 @@
                             .then(data => {
                                 if (data.status === 'success') {
                                     correct_dialog.call(this, '操作成功');
-                                    localStorage.setItem('username', this.loginForm.username);
-                                    window.location.href = 'recommend.html';
+                                    setTimeout(() => {
+                                        window.location.href = 'login.html';
+                                    }, 3000);
+                                    
+                                    
+
+                                    // localStorage.setItem('username', this.loginForm.username);
+                                    
                                 } else {
                                     error_dialog.call(this, '注册失败: ' + data.message);
                                 }
