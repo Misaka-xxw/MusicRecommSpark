@@ -93,7 +93,7 @@
                 };
             },
             methods: {
-                
+
                 submitLoginForm() {
                     // if (this.loginForm.username === '' || this.loginForm.password === '') {
                     //     error_dialog.call(this, '用户名或密码不能为空');
@@ -164,16 +164,18 @@
                 displayErrorDialog(msg) {
                     error_dialog.call(this, msg);
                 }
+            },
+            mounted() {
+                // 获取当前页面的 URL 查询参数
+                const urlParams = new URLSearchParams(window.location.search);
+                const msg = urlParams.get('msg');
+
+                // 检查 msg 参数是否为 "login_required"
+                if (msg === 'login_required') {
+                    console.log('请先登录');
+                    error_dialog.call(this, '请先登录');
+                }
             }
-            // onload() {
-            //     console.log('onload')
-            //     // Check URL parameters for login_required
-            //     const urlParams = new URLSearchParams(window.location.search);
-            //     console.log(urlParams.get('msg'))
-            //     if (urlParams.has('msg') && urlParams.get('msg') === 'login_required') {
-            //         this.displayErrorDialog('请先登录');
-            //     }
-            // }
         });
     </script>
 </body>
