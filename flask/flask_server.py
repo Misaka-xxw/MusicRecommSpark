@@ -105,6 +105,10 @@ def execute_spark_submit(task_uuid: str,
 
     return "SUBMITTED"
 
+@app.before_request
+def redirect_before_request():
+    if request.host == 'localhost:5000':
+        return redirect('http://127.0.0.1:5000' + request.path, code=301)
 
 @app.route('/apis/v1/start-task', methods=['POST'])
 @cross_origin(origin='*')
@@ -121,7 +125,7 @@ def start_task():
     personal_ratings_data = data['personal_ratings']
     dat_file = ''
     for item in personal_ratings_data:
-        dat_line = f"{item['user_id']}::{item['movie_id']}::{item['rating']}::{item['timestamp']}\n"
+        dat_line = f"{item['user_id']}::{item['music_id']}::{item['rating']}::{item['timestamp']}\n"
         dat_file += dat_line
 
     # generate UUID here
@@ -317,7 +321,7 @@ def split_stdout(s: str) -> list[dict]:
     for i in range(2, len(lines)):
         word = lines[i].split(":")
         if len(word) > 2:
-            res.append({'user_id': word[0], 'movie_id': word[1], 'rating': word[2], 'name': word[3]})
+            res.append({'user_id': word[0], 'music_id': word[1], 'rating': word[2], 'name': word[3]})
     # Sort the result by rating in descending order
     res.sort(key=lambda x: float(x['rating']), reverse=True)
     return res

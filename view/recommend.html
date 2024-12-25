@@ -262,9 +262,9 @@
                 },
                 async initPage() {
                     let randomIds = await this.getRandomMusicID();
-                    let requestInfoResult = await this.getMoviesInfo(randomIds);
+                    let requestInfoResult = await this.getMusicsInfo(randomIds);
                     // console.log('requestInfoResult:', requestInfoResult);
-                    this.albums = await this.moviesInfo2Albums(requestInfoResult);
+                    this.albums = await this.musicsInfo2Albums(requestInfoResult);
                     correct_dialog.call(this, '音乐加载完成');
                 },
                 async getMaxId() {
@@ -284,11 +284,11 @@
                     console.log('randomIds:', randomIds);
                     return randomIds;
                 },
-                async getMoviesInfo(randomIds) {
+                async getMusicsInfo(randomIds) {
                     // Convert Set to Array
                     let idsArray = Array.from(randomIds);
                     console.log(idsArray);
-                    // Use "get movie info" API to post these numbers as JSON to the server
+                    // Use "get music info" API to post these numbers as JSON to the server
                     try {
                         const response = await fetch('http://127.0.0.1:5000/apis/v1/get-musics-info', {
                             method: 'POST',
@@ -298,29 +298,29 @@
                             body: JSON.stringify(idsArray)
                         });
                         const data = await response.json();
-                        console.log('getMovieInfo Return data:', data);
+                        console.log('getMusicInfo Return data:', data);
                         return data;
                     } catch (error) {
                         console.error('Error:', error);
                     }
                 },
-                async moviesInfo2Albums(moviesInfo) {
-                    console.log('moviesInfo:', moviesInfo);
+                async musicsInfo2Albums(musicsInfo) {
+                    console.log('musicsInfo:', musicsInfo);
                     let albums = [];
-                    let keys = Object.keys(moviesInfo);
+                    let keys = Object.keys(musicsInfo);
                     for (let i = 0; i < keys.length; i++) {
                         let key = keys[i];
                         let album = {
                             id: i + 1,
-                            click_url: moviesInfo[key]['click_url'],
-                            img_url: moviesInfo[key]['img_url'],
-                            name: moviesInfo[key]['name'],
-                            tag: moviesInfo[key]['tag'],
-                            year: moviesInfo[key]['year'],
-                            singer: moviesInfo[key]['singer'],
+                            click_url: musicsInfo[key]['click_url'],
+                            img_url: musicsInfo[key]['img_url'],
+                            name: musicsInfo[key]['name'],
+                            tag: musicsInfo[key]['tag'],
+                            year: musicsInfo[key]['year'],
+                            singer: musicsInfo[key]['singer'],
                             rate: 0
                         };
-                        album.img_url = 'http://127.0.0.1:5000/apis/v1/get-image/' + encodeURIComponent(moviesInfo[key]['img_url']);
+                        album.img_url = 'http://127.0.0.1:5000/apis/v1/get-image/' + encodeURIComponent(musicsInfo[key]['img_url']);
                         albums.push(album);
                     }
                     console.log('albums:', albums);
@@ -367,11 +367,11 @@
                         console.log('task_result:', task_result);
                         correct_dialog.call(this, '推荐完成');
 
-                        let recommendedMusicIds = task_result.data.map(item => parseInt(item.movie_id));
+                        let recommendedMusicIds = task_result.data.map(item => parseInt(item.music_id));
                         let recommendedMusicRate = task_result.data.map(item => parseFloat(item.rating));
-                        let requestInfoResult = await this.getMoviesInfo(recommendedMusicIds);
+                        let requestInfoResult = await this.getMusicsInfo(recommendedMusicIds);
                         console.log('requestInfoResult:', requestInfoResult);
-                        this.albums = await this.moviesInfo2Albums(requestInfoResult);
+                        this.albums = await this.musicsInfo2Albums(requestInfoResult);
                         for (var i = 0; i < this.albums.length; i++) {
                             this.albums[i].rate = recommendedMusicRate[i];
                         }
@@ -390,29 +390,11 @@
                     }
                 },
                 async startTask() {
-                    //format example:
-                    /*
-                    {
-                        "personal_ratings": [
-                            {
-                                "user_id": 1,
-                                "movie_id": 1,
-                                "rating": 5,
-                                "timestamp": 123456789
-                            },
-                            {
-                                "user_id": 1,
-                                "movie_id": 2,
-                                "rating": 4,
-                                "timestamp": 123456789
-                            }
-                        ]
-                    }
-                    */
+                    
                     const data = {
                         personal_ratings: this.albums.map(album => ({
                             user_id: 1,// wait to replace with the actual user ID
-                            movie_id: album.id,
+                            music_id: album.id,
                             rating: album.rate,
                             timestamp: Date.now()
                         }))
