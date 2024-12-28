@@ -96,7 +96,7 @@
             <transition name="el-zoom-in-bottom">
                 <div class="button_area" v-show="show_button">
                     <el-button class="custom-button" @click="login_page()">登录或注册</el-button>
-                    <el-button class="custom-button" @click="recommond_page()">直接进入</el-button>
+                    <el-button class="custom-button" @click="recommend_page()">直接进入</el-button>
                 </div>
             </transition>
         </div>
@@ -138,8 +138,8 @@
                 login_page() {
                     window.location.href = 'login.html';
                 },
-                recommond_page() {
-                    window.location.href = 'recommond.html';
+                recommend_page() {
+                    window.location.href = 'recommend.html';
                 }
             }
         }
